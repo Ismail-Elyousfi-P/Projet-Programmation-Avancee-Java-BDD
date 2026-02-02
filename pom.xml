@@ -15,7 +15,7 @@
   </properties>
 
   <dependencies>
-    <!-- JavaFX -->
+    
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
@@ -31,11 +31,11 @@
   </dependencies>
 
   <build>
-    <!-- IMPORTANT : ton code est dans ./java (pas src/main/java) -->
+    
     <sourceDirectory>java</sourceDirectory>
 
     <plugins>
-      <!-- Compiler -->
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -45,13 +45,13 @@
         </configuration>
       </plugin>
 
-      <!-- JavaFX Run -->
+      
       <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <!-- puisque ton MainApp.java n'a pas de package -->
+          
           <mainClass>MainApp</mainClass>
         </configuration>
       </plugin>
