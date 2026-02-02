@@ -8,6 +8,7 @@
 DROP TABLE IF EXISTS intervention;
 DROP TABLE IF EXISTS batiment;
 DROP TABLE IF EXISTS technicien;
+DROP TABLE IF EXISTS responsable;
 
 -- =====================================================
 -- Table : technicien
@@ -15,9 +16,26 @@ DROP TABLE IF EXISTS technicien;
 CREATE TABLE technicien (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
+	prenom VARCHAR(100) NOT NULL,
+	telephone VARCHAR(20) NOT NULL,
     qualification VARCHAR(100) NOT NULL,
     disponible BOOLEAN NOT NULL DEFAULT TRUE
 );
+
+
+
+-- =====================================================
+-- Table : intervention
+-- =====================================================
+CREATE TABLE responsable (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL,
+	prenom VARCHAR(100) NOT NULL,
+	email VARCHAR(100) NOT NULL,
+	telephone VARCHAR(20) NOT NULL,
+	mdp_hash VARCHAR(32) NOT NULL
+);
+
 
 -- =====================================================
 -- Table : batiment
@@ -35,6 +53,7 @@ CREATE TABLE intervention (
     id INT AUTO_INCREMENT PRIMARY KEY,
 
     technicien_id INT NOT NULL,
+	responsable_id INT NOT NULL,
     batiment_id INT NOT NULL,
 
     date_intervention DATETIME NOT NULL,
@@ -49,6 +68,14 @@ CREATE TABLE intervention (
     CONSTRAINT fk_intervention_technicien
         FOREIGN KEY (technicien_id)
         REFERENCES technicien(id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+
+    -- Clé étrangère vers responsable
+    CONSTRAINT fk_intervention_responsable
+        FOREIGN KEY (responsable_id)
+        REFERENCES responsable(id)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
 
