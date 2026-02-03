@@ -4,6 +4,7 @@ import model.Intervention;
 import model.Technicien;
 import model.Batiment;
 import util.HibernateUtil;
+import java.util.Date;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -139,34 +140,51 @@ public class InterventionDAO {
     public List<Intervention> findByCriteria(
             Technicien technicien,
             Batiment batiment,
-            String statut
+            String statut,
+            Date dateIntervention
     ) {
 
         try (Session session = HibernateUtil.openSession()) {
 
-            StringBuilder hql = new StringBuilder("from Intervention i where 1=1");
+            StringBuilder hql = new StringBuilder(
+                    "from Intervention i where 1=1"
+            );
 
             if (technicien != null) {
                 hql.append(" and i.technicien = :technicien");
             }
+
             if (batiment != null) {
                 hql.append(" and i.batiment = :batiment");
             }
+
             if (statut != null && !statut.isBlank()) {
                 hql.append(" and i.statut = :statut");
             }
 
-            Query<Intervention> query =
-                    session.createQuery(hql.toString(), Intervention.class);
+            if (dateIntervention != null) {
+                hql.append(" and date(i.dateIntervention) = :dateIntervention");
+            }
+
+            Query<Intervention> query = session.createQuery(hql.toString(), Intervention.class);
 
             if (technicien != null) {
                 query.setParameter("technicien", technicien);
             }
+
             if (batiment != null) {
                 query.setParameter("batiment", batiment);
             }
+
             if (statut != null && !statut.isBlank()) {
                 query.setParameter("statut", statut);
+            }
+
+            if (dateIntervention != null) {
+                query.setParameter(
+                    "dateIntervention",
+                    new java.sql.Date(dateIntervention.getTime())
+                );
             }
 
             return query.getResultList();
