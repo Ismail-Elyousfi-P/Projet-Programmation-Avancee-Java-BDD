@@ -2,53 +2,92 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.ColumnConstraints?>
 
-<BorderPane xmlns="http://javafx.com/javafx/25" 
-	xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="controller.InterventionController">
+<BorderPane prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.InterventionController">
 
     <top>
-	    <VBox spacing="10">
-	        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" prefWidth="402.0" style="-fx-font-size: 18;" text="Gestion des interventions" textAlignment="CENTER" />
-	
-	        <HBox alignment="TOP_CENTER" spacing="10">
-	            <ComboBox fx:id="filtreTechnicien" promptText="Technicien" prefWidth="200" />
-	            <ComboBox fx:id="filtreBatiment" promptText="Bâtiment" prefWidth="200" />
-	            <ComboBox fx:id="filtreStatut" promptText="Statut" prefWidth="200" />
-	        </HBox>
-	
-	        <Separator />
-	    </VBox>
-	</top>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <Label text="Consultation des interventions" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
 
-	
-	
+
+            <HBox spacing="10">
+                <ComboBox fx:id="filtreTechnicien" prefWidth="150.0" promptText="Technicien" />
+                <ComboBox fx:id="filtreBatiment" prefWidth="150.0" promptText="Bâtiment" />
+                <ComboBox fx:id="filtreStatut" prefWidth="120.0" promptText="Statut" />
+                <DatePicker fx:id="filtreDate" promptText="Date intervention" />
+                <Button onAction="#handleFiltrer" text="Filtrer" />
+                <Button onAction="#handleReset" text="Réinitialiser" />
+            </HBox>
+        </VBox>
+    </top>
+
     <center>
-        <TableView fx:id="table">
+        <TableView fx:id="interventionTable" prefHeight="300.0">
             <columns>
-                <TableColumn fx:id="colDate" text="Date" />
-                <TableColumn fx:id="colType" text="Type" />
-                <TableColumn fx:id="colStatut" text="Statut" />
-                <TableColumn fx:id="colTechnicien" text="Technicien" />
-                <TableColumn fx:id="colBatiment" text="Bâtiment" />
+                <TableColumn fx:id="colDate" prefWidth="150.0" text="Date" />
+                <TableColumn fx:id="colTechnicien" prefWidth="150.0" text="Technicien" />
+                <TableColumn fx:id="colBatiment" prefWidth="150.0" text="Bâtiment" />
+                <TableColumn fx:id="colType" prefWidth="150.0" text="Type" />
+                <TableColumn fx:id="colStatut" prefWidth="100.0" text="Statut" />
             </columns>
         </TableView>
     </center>
 
     <bottom>
-        <HBox alignment="CENTER" spacing="10" style="-fx-padding: 4;">
-            <Button onAction="#handleAjouter" text="Programmer" />
-            <Button onAction="#handleModifier" text="Modifier" />
-            <Button onAction="#handleCloturer" text="Clôturer" />
-            <Button onAction="#handleSupprimer" text="Supprimer" />
-            <Button onAction="#handleRetour" text="Retour" />
-        </HBox>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            
+
+            <Label text="Ajouter une intervention" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+            
+            <GridPane hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="100" prefWidth="120" />
+                    <ColumnConstraints minWidth="200" prefWidth="250" />
+                    <ColumnConstraints minWidth="100" prefWidth="120" />
+                    <ColumnConstraints minWidth="200" prefWidth="250" />
+                </columnConstraints>
+                
+
+                <Label text="Technicien :" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <ComboBox fx:id="technicienCombo" prefWidth="250.0" promptText="Sélectionner un technicien" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                
+                <Label text="Bâtiment :" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                <ComboBox fx:id="batimentCombo" prefWidth="250.0" promptText="Sélectionner un bâtiment" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                
+
+                <Label text="Date :" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <DatePicker fx:id="datePicker" prefWidth="250.0" promptText="Date de l'intervention" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                
+                <Label text="Type :" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <TextField fx:id="typeField" prefWidth="250.0" promptText="Type d'intervention" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                
+
+                <Label text="Description :" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <TextArea fx:id="descriptionArea" prefHeight="80.0" prefWidth="250.0" 
+                          promptText="Description de l'intervention" wrapText="true"
+                          GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="3" />
+            </GridPane>
+            
+
+            <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10;">
+                <Button text="Ajouter" onAction="#handleAjouter" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
+                <Button text="Modifier le statut" onAction="#handleModifier" style="-fx-background-color: #2196F3; -fx-text-fill: white;" />
+                <Button text="Supprimer" onAction="#handleSupprimer" style="-fx-background-color: #f44336; -fx-text-fill: white;" />
+                <Button onAction="#handleRetour" text="Retour" />
+            </HBox>
+        </VBox>
     </bottom>
+
 </BorderPane>
