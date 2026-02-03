@@ -1,7 +1,7 @@
 package model;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "intervention")
@@ -24,7 +24,7 @@ public class Intervention {
     private Batiment batiment;
 
     @Column(name = "date_intervention", nullable = false)
-    private LocalDateTime dateIntervention;
+    private Date dateIntervention;
 
     @Column(name = "type_intervention", nullable = false, length = 100)
     private String typeIntervention;
@@ -68,11 +68,11 @@ public class Intervention {
         this.batiment = batiment;
     }
 
-    public LocalDateTime getDateIntervention() {
+    public Date getDateIntervention() {
         return dateIntervention;
     }
 
-    public void setDateIntervention(LocalDateTime dateIntervention) {
+    public void setDateIntervention(Date dateIntervention) {
         this.dateIntervention = dateIntervention;
     }
 
