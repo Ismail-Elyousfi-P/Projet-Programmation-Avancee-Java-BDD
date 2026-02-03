@@ -27,6 +27,12 @@
         <artifactId>javafx-graphics</artifactId>
         <version>${javafx.version}</version>
     </dependency>
+    
+    <dependency>
+	    <groupId>org.openjfx</groupId>
+	    <artifactId>javafx-fxml</artifactId>
+	    <version>${javafx.version}</version>
+	</dependency>
 
 	<dependency>
         <groupId>org.hibernate</groupId>
@@ -60,7 +66,7 @@
     
 	<resources>
         <resource>
-            <directory>java/resources</directory>
+            <directory>resources</directory>
             <includes>
                 <include>**/*</include>
             </includes>
@@ -84,7 +90,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>ui.MainApp</mainClass>
+          <mainClass>app.MainApp</mainClass>
         </configuration>
       </plugin>
     </plugins>
