@@ -32,8 +32,9 @@ public class Intervention {
     @Column(name = "statut", nullable = false, length = 20)
     private String statut;
 
-    @Lob
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
+
 
     public int getId() {
         return id;
