@@ -1,7 +1,10 @@
+version: "3.9"
+
 services:
   db:
     image: mariadb:11
     container_name: maintenance-db
+    restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_DATABASE: maintenance
@@ -16,6 +19,7 @@ services:
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: maintenance-phpmyadmin
+    restart: unless-stopped
     depends_on:
       - db
     environment:

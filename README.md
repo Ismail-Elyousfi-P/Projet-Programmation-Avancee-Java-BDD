@@ -7,7 +7,7 @@
 
 **Projet réalisé par :**
 - Cheikh Mbake Seye  
-- Ismail EL-YOUSFI  
+- Ismail EL YOUSFI  
 - Oualid CHAREF  
 
 Ce document sert à la fois :
@@ -19,125 +19,92 @@ Il est destiné à tous les membres du groupe ainsi qu’au professeur.
 
 ---
 
-## Présentation générale du projet
+## Présentation générale
 
-Le projet consiste à développer une application Java permettant de gérer un service de maintenance technique.
+Ce projet est une application desktop développée en Java dans le cadre d’un projet
+de programmation avancée avec base de données.
 
-L’application permettra :
-- de gérer des **techniciens**
-- de gérer des **bâtiments**
-- de planifier et suivre des **interventions**
-- de conserver un **historique** des interventions réalisées
+L’objectif est de gérer des interventions de maintenance sur des bâtiments,
+en impliquant des techniciens et un responsable authentifié.
 
----
-
-## Organisation générale du projet
-
-```text
-projet Java ISN/
-├── README.md                 ← Documentation et suivi du projet
-├── docker-compose.yml        ← Déploiement de la base de données
-├── sql/
-│   └── 01_create_tables.sql  ← Création des tables SQL
-└── java/                     ← Code Java / JavaFX
-
-
-
-
-
-
-## PARTIE 1 – Mise en place de l’environnement Docker
-
-### Objectif
-Mettre en place un environnement commun à tous les membres du projet afin de disposer
-d’une base de données fonctionnelle sans installation manuelle de MariaDB sur le système.
-
-L’utilisation de Docker permet à chaque membre du groupe, ainsi qu’au professeur,
-de lancer exactement le même environnement.
+L’application repose sur :
+- JavaFX pour l’interface graphique
+- Hibernate ORM pour la persistance
+- MariaDB pour la base de données
+- Maven pour la gestion du projet
 
 ---
 
-### 1.1 Création et configuration de Docker
+## Modèle conceptuel de données
 
-La base de données est déployée à l’aide d’un fichier `docker-compose.yml` situé à la racine du projet.
+Le modèle conceptuel de données (MCD) décrit les entités principales et leurs relations :
+- Responsable
+- Technicien
+- Bâtiment
+- Intervention
 
-Ce fichier définit deux services :
-- **MariaDB** : serveur de base de données
-- **phpMyAdmin** : interface web permettant de gérer la base de données
-
-Les identifiants (utilisateurs et mots de passe) sont définis directement dans le fichier
-`docker-compose.yml`, ce qui permet à toute personne travaillant sur le projet de les consulter.
-
----
-
-### 1.2 Démarrage de Docker
-
-Pour démarrer l’environnement Docker, la commande suivante est exécutée depuis
-la racine du projet :
-
-```bash
-sudo docker compose up -d
-
-
-
-## PARTIE 2 – Base de données : principe et création
-
-### Objectif
-Le projet a besoin d’une base de données pour **enregistrer** et **retrouver** les informations.
-Sans base de données, toutes les données seraient perdues dès qu’on ferme l’application.
+Le schéma MCD est disponible dans le projet : <br />
+![MCD](sql/MCD.png)
 
 ---
 
-### 2.1 À quoi sert une base de données dans ce projet ?
-Une base de données relationnelle sert à :
-- stocker les informations de manière organisée
-- éviter les doublons
-- relier des informations entre elles (ex : une intervention est faite par un technicien dans un bâtiment)
-- permettre à l’application Java de faire des opérations :
-  - ajouter des données (INSERT)
-  - consulter des données (SELECT)
-  - modifier (UPDATE)
-  - supprimer (DELETE)
+## Architecture et organisation du code
 
----
+Le projet suit une architecture en couches afin de séparer les responsabilités.
 
-### 2.2 Choix : MariaDB + Docker
-Nous utilisons :
-- **MariaDB** : le serveur de base de données (stockage réel des données)
-- **Docker / Docker Compose** : pour lancer MariaDB facilement, de manière identique pour tout le monde
-
-Avantage : chaque membre du groupe (et le professeur) peut lancer la base localement, sans installer MariaDB manuellement.
-
----
-
-### 2.3 Création automatique de la base (pas de création manuelle)
-La base est créée automatiquement au démarrage de Docker grâce au fichier :
-
-- `docker-compose.yml`
-
-Dans notre configuration, la base s’appelle :
-- `maintenance`
-
-Cette base est créée automatiquement car on définit `MARIADB_DATABASE=maintenance`
-dans `docker-compose.yml`.
-
+Projet<br />
+├── java/<br />
+│ ├── app/<br />
+│ │ └── MainApp.java<br />
+│ ├── controller/<br />
+│ │ └── *Controller.java<br />
+│ ├── dao/<br />
+│ │ └── *DAO.java<br />
+│ ├── model/<br />
+│ │ └── Entités Hibernate<br />
+│ └── util/<br />
+│ └── HibernateUtil, PasswordHash<br />
+│<br />
+├── resources/<br />
+│ ├── views/<br />
+│ │ └── *.fxml<br />
+│ └── hibernate.cfg.xml<br />
+│<br />
+├── sql/<br />
+│ ├── MCD.png<br />
+│ └── 01_create_tables.sql<br />
+│<br />
+└── pom.xml<br />
 
 
 ---
-## PARTIE 3 – Création des tables (SQL) : contenu et utilité
 
-### Objectif
-Définir la structure de la base de données sous forme de tables, afin de stocker
-les informations du projet (techniciens, bâtiments, interventions) et les relations entre elles.
+## Choix du pattern DAO
+
+Le projet utilise le pattern DAO (Data Access Object).
+
+Ce choix permet :
+- de séparer la logique métier de l’accès aux données
+- d’isoler Hibernate du reste de l’application
+- de centraliser les opérations CRUD
+- de faciliter la maintenance et l’évolution du code
+
+Les contrôleurs JavaFX n’accèdent jamais directement à Hibernate.
+Toute interaction avec la base passe par les classes DAO.
 
 ---
 
-### 3.1 Où se trouve le fichier SQL ?
-Les tables sont définies dans un fichier SQL versionné dans le projet :
+## Création de la base de données et des tables
 
-```text
-sql/01_create_tables.sql
+Les tables sont définies dans un fichier SQL versionné dans le projet à executer :
 
+sql/01_create_tables.sql 
+
+
+Ce fichier contient l’ensemble des instructions CREATE TABLE correspondant
+au modèle de données.
+
+---
 
 ## Interface phpMyAdmin – Accès et administration de la base de données
 
@@ -152,10 +119,7 @@ des tables et de gérer les données plus facilement.
 ### Accès à l’interface phpMyAdmin
 
 Une fois Docker démarré, l’interface phpMyAdmin est accessible depuis
-un navigateur web à l’adresse suivante :
-
-Adresse d’accès :
-http://localhost:8080
+un navigateur web à l’adresse suivante : http://localhost:8080
 
 Cette adresse est définie dans le fichier `docker-compose.yml`
 via la configuration des ports.
@@ -169,8 +133,8 @@ via la configuration des ports.
 
 Sur l’écran de connexion phpMyAdmin, les informations suivantes doivent être saisies.
 
-Serveur :
-db
+Serveur : db
+
 
 Les identifiants de connexion sont définis directement dans le fichier
 `docker-compose.yml`.
@@ -183,50 +147,29 @@ Connexion applicative :
 - Utilisateur : app
 - Mot de passe : app
 
-Ces comptes sont utilisés uniquement dans le cadre du développement
-pour administrer et exploiter la base de données du projet.
+Ces comptes sont utilisés uniquement dans le cadre du développement.
 
 ---
 
-### Lien avec la création des tables SQL
+## Authentification – Compte de test
 
-La structure de la base de données (tables et relations) est définie
-dans le fichier SQL suivant :
+Un utilisateur de test est disponible pour se connecter à l’application.
 
-sql/01_create_tables.sql
+- Email : admin@maintenance.local
+- Mot de passe : admin123
 
-Ce fichier contient toutes les instructions CREATE TABLE nécessaires.
+Le mot de passe est stocké en base sous forme de hash MD5.
 
-Il est exécuté automatiquement par MariaDB lors du démarrage de Docker
-lorsque la base de données est vide.
-
----
-
-### Vérification de la base via phpMyAdmin
-
-Après connexion à phpMyAdmin :
-
-- sélectionner la base de données du projet
-- vérifier la présence des tables :
-  - technicien
-  - batiment
-  - intervention
-
-La présence de ces tables confirme que le fichier SQL a bien été exécuté
-et que la base de données est prête à être utilisée.
+L’utilisateur connecté est conservé en mémoire dans l’application
+afin d’être utilisé lors des opérations (création d’interventions, etc.).
 
 ---
 
-### Connexion Java à MariaDB (paramètres)
+## Lancement de l’application
 
-L’application Java doit se connecter à la base MariaDB avec l’utilisateur applicatif :
+Après avoir démarré Docker et vérifié la base de données, l’application
+peut être lancée avec Maven :
 
-- Host : localhost
-- Port : 3306
-- Base : maintenance
-- Utilisateur : app
-- Mot de passe : app
-
-URL JDBC :
-jdbc:mariadb://localhost:3306/maintenance
-
+```bash
+mvn javafx:run
+```
