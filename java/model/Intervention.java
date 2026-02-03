@@ -99,4 +99,16 @@ public class Intervention {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+    // pour acces rapide
+    public String getTechnicienNom() {
+        if (technicien == null) return "";
+        return technicien.toString();
+    }
+
+    public String getBatimentNom() {
+        if (batiment == null) return "";
+        return batiment.toString();
+    }
+
 }

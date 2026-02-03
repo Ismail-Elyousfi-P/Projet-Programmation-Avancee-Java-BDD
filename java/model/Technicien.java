@@ -72,4 +72,10 @@ public class Technicien {
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
     }
+    
+    @Override
+    public String toString() {
+        return this.nom + " " + this.prenom;
+    }
+
 }

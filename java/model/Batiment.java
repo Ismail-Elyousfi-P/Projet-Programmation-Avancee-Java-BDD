@@ -40,4 +40,10 @@ public class Batiment {
     public void setLocalisation(String localisation) {
         this.localisation = localisation;
     }
+    
+    @Override
+    public String toString() {
+    	return nom + " (" + localisation + ")";
+    }
+
 }
