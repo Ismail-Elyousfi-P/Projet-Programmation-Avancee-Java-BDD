@@ -24,24 +24,23 @@ public class AccueilController {
     // Actions FXML
     @FXML
     private void handleTechniciens() {
-        System.out.println("Navigation vers Techniciens");
         MainApp.afficherTechniciens();
     }
 
     @FXML
     private void handleBatiments() {
-        System.out.println("Navigation vers Bâtiments");
         MainApp.afficherBatiments();
     }
 
     @FXML
     private void handleInterventions() {
-        System.out.println("Navigation vers Interventions");
         MainApp.afficherInterventions();
     }
 
+    // Déconnecter reellement (enlever les placeholder)
     @FXML
     private void handleLogout() {
-        System.out.println("Déconnexion");
+    	MainApp.setResponsableConnecte(null);
+        MainApp.afficherConnexion();
     }
 }

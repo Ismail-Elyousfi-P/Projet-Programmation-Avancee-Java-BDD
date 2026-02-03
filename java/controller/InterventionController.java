@@ -1,225 +1,184 @@
 package controller;
 
+import app.MainApp;
 import dao.BatimentDAO;
 import dao.InterventionDAO;
 import dao.TechnicienDAO;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import model.Batiment;
 import model.Intervention;
-import model.Responsable;
 import model.Technicien;
-import app.MainApp;
 
+import java.net.URL;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.ResourceBundle;
 
-public class InterventionController {
+public class InterventionController implements Initializable {
 
-    // ========================
-    // Filtres
-    // ========================
-    @FXML
-    private ComboBox<Technicien> filtreTechnicien;
+    // Tables
+    @FXML private TableView<Intervention> interventionTable;
+    @FXML private TableColumn<Intervention, Date> colDate;
+    @FXML private TableColumn<Intervention, String> colTechnicien;
+    @FXML private TableColumn<Intervention, String> colBatiment;
+    @FXML private TableColumn<Intervention, String> colType;
+    @FXML private TableColumn<Intervention, String> colStatut;
 
-    @FXML
-    private ComboBox<Batiment> filtreBatiment;
+    // Composantse des filtres
+    @FXML private ComboBox<Technicien> filtreTechnicien;
+    @FXML private ComboBox<Batiment> filtreBatiment;
+    @FXML private ComboBox<String> filtreStatut;
+    @FXML private DatePicker filtreDate;
 
-    @FXML
-    private ComboBox<String> filtreStatut;
+    // Composantes du formulaire d'ajout
+    @FXML private ComboBox<Technicien> technicienCombo;
+    @FXML private ComboBox<Batiment> batimentCombo;
+    @FXML private DatePicker datePicker;
+    @FXML private TextField typeField;
+    @FXML private TextArea descriptionArea;
 
-    // ========================
-    // Formulaire
-    // ========================
-    @FXML
-    private ComboBox<Technicien> technicienCombo;
-
-    @FXML
-    private ComboBox<Batiment> batimentCombo;
-
-    @FXML
-    private DatePicker datePicker;
-
-    @FXML
-    private TextField typeField;
-
-    @FXML
-    private ComboBox<String> statutCombo;
-
-    @FXML
-    private TextArea descriptionArea;
-
-    // ========================
-    // Table
-    // ========================
-    @FXML
-    private TableView<Intervention> tableInterventions;
-
-    // ========================
-    // DAO
-    // ========================
+    // Appel au DAO
     private final InterventionDAO interventionDAO = new InterventionDAO();
     private final TechnicienDAO technicienDAO = new TechnicienDAO();
     private final BatimentDAO batimentDAO = new BatimentDAO();
 
-    // ========================
-    // INITIALISATION
-    // ========================
-    @FXML
-    public void initialize() {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
 
-        List<String> statuts = List.of("Planifiée", "En cours", "Terminée");
+        // Récuperer exactement olonnes TableView 
+        colDate.setCellValueFactory(new PropertyValueFactory<>("dateIntervention"));
+        colType.setCellValueFactory(new PropertyValueFactory<>("typeIntervention"));
+        colStatut.setCellValueFactory(new PropertyValueFactory<>("statut"));
 
-        filtreStatut.setItems(FXCollections.observableArrayList(statuts));
-        statutCombo.setItems(FXCollections.observableArrayList(statuts));
+        // getTechnicienNom() / getBatimentNom()
+        colTechnicien.setCellValueFactory(new PropertyValueFactory<>("technicienNom"));
+        colBatiment.setCellValueFactory(new PropertyValueFactory<>("batimentNom"));
 
-        filtreTechnicien.setItems(
-                FXCollections.observableArrayList(technicienDAO.findAll())
-        );
+        // préparation des listes (pour filtres)
+        List<Technicien> techniciens = technicienDAO.findAll();
+        List<Batiment> batiments = batimentDAO.findAll();
 
-        filtreBatiment.setItems(
-                FXCollections.observableArrayList(batimentDAO.findAll())
-        );
+        filtreTechnicien.setItems(FXCollections.observableArrayList(techniciens));
+        filtreBatiment.setItems(FXCollections.observableArrayList(batiments));
 
-        technicienCombo.setItems(
-                FXCollections.observableArrayList(technicienDAO.findAll())
-        );
+        technicienCombo.setItems(FXCollections.observableArrayList(techniciens));
+        batimentCombo.setItems(FXCollections.observableArrayList(batiments));
 
-        batimentCombo.setItems(
-                FXCollections.observableArrayList(batimentDAO.findAll())
-        );
+        filtreStatut.setItems(FXCollections.observableArrayList(
+                "Planifiée", "En cours", "Terminée"
+        ));
 
-        refreshTable();
+        // chargement initial
+        this.chargerInterventions();
     }
 
-    // ========================
-    // ACTIONS
-    // ========================
+    // chargement ou rechargement de données
+    private void chargerInterventions() {
+        List<Intervention> list = interventionDAO.findAll();
+        interventionTable.setItems(FXCollections.observableArrayList(list));
+    }
 
+    // filtres
+    @FXML
+    private void handleFiltrer() {
+
+        Technicien technicien = filtreTechnicien.getValue();
+        Batiment batiment = filtreBatiment.getValue();
+        String statut = filtreStatut.getValue();
+
+        Date date = null;
+        if (filtreDate.getValue() != null) {
+            date = java.sql.Date.valueOf(filtreDate.getValue());
+        }
+
+        List<Intervention> result = interventionDAO.findByCriteria(technicien, batiment, statut, date);
+
+        interventionTable.setItems(FXCollections.observableArrayList(result));
+    }
+
+    @FXML
+    private void handleReset() {
+
+        filtreTechnicien.setValue(null);
+        filtreBatiment.setValue(null);
+        filtreStatut.setValue(null);
+        filtreDate.setValue(null);
+
+        this.chargerInterventions();
+    }
+
+    // Operations crud sur interventions
     @FXML
     private void handleAjouter() {
 
-        Responsable responsable = MainApp.getResponsableConnecte();
-        if (responsable == null) {
-            showError("Aucun responsable connecté.");
-            return;
-        }
+        Technicien technicien = technicienCombo.getValue();
+        Batiment batiment = batimentCombo.getValue();
+        LocalDate localDate = datePicker.getValue();
 
-        if (technicienCombo.getValue() == null ||
-            batimentCombo.getValue() == null ||
-            datePicker.getValue() == null ||
-            typeField.getText().isBlank()) {
-
-            showError("Veuillez remplir tous les champs obligatoires.");
+        if (technicien == null || batiment == null || localDate == null) {
             return;
         }
 
         Intervention i = new Intervention();
-        i.setTechnicien(technicienCombo.getValue());
-        i.setBatiment(batimentCombo.getValue());
-        i.setResponsable(responsable);
+        i.setTechnicien(technicien);
+        i.setBatiment(batiment);
+        i.setDateIntervention(java.sql.Date.valueOf(localDate));
         i.setTypeIntervention(typeField.getText());
-        i.setStatut(statutCombo.getValue());
-
-        LocalDate localDate = datePicker.getValue();
-        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        i.setDateIntervention(date);
-
         i.setDescription(descriptionArea.getText());
+        i.setStatut("Planifiée");
+        i.setResponsable(MainApp.getResponsableConnecte());
 
         interventionDAO.save(i);
-        refreshTable();
-        clearForm();
+        this.chargerInterventions();
     }
 
     @FXML
     private void handleModifier() {
 
-        Intervention selected = tableInterventions.getSelectionModel().getSelectedItem();
+        Intervention selected = interventionTable.getSelectionModel().getSelectedItem();
+        String nextStatut = null;
         if (selected == null) {
-            showError("Veuillez sélectionner une intervention.");
             return;
         }
-
-        selected.setTechnicien(technicienCombo.getValue());
-        selected.setBatiment(batimentCombo.getValue());
-        selected.setTypeIntervention(typeField.getText());
-        selected.setStatut(statutCombo.getValue());
-        selected.setDescription(descriptionArea.getText());
-
-        if (datePicker.getValue() != null) {
-            Date date = Date.from(
-                    datePicker.getValue()
-                            .atStartOfDay(ZoneId.systemDefault())
-                            .toInstant()
-            );
-            selected.setDateIntervention(date);
+        
+        switch (selected.getStatut()) {
+        case "En cours":
+        	nextStatut = "Terminée";
+            break;
+        case "Planifiée":
+        	nextStatut = "En cours";
+            break;
+        case "Terminée":
+        	nextStatut = "Planifiée";
+            break;
         }
-
+        
+        selected.setStatut(nextStatut);
         interventionDAO.update(selected);
-        refreshTable();
-    }
-
-    @FXML
-    private void handleCloturer() {
-
-        Intervention selected = tableInterventions.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showError("Sélectionnez une intervention.");
-            return;
-        }
-
-        selected.setStatut("Terminée");
-        interventionDAO.update(selected);
-        refreshTable();
+        this.chargerInterventions();
     }
 
     @FXML
     private void handleSupprimer() {
 
-        Intervention selected = tableInterventions.getSelectionModel().getSelectedItem();
+        Intervention selected =
+                interventionTable.getSelectionModel().getSelectedItem();
+
         if (selected == null) {
-            showError("Sélectionnez une intervention.");
             return;
         }
 
         interventionDAO.delete(selected);
-        refreshTable();
+        this.chargerInterventions();
     }
-
+    
     @FXML
     private void handleRetour() {
         MainApp.afficherAccueil();
-    }
-
-    // ========================
-    // OUTILS
-    // ========================
-    private void refreshTable() {
-        tableInterventions.setItems(
-                FXCollections.observableArrayList(
-                        interventionDAO.findAll()
-                )
-        );
-    }
-
-    private void clearForm() {
-        technicienCombo.setValue(null);
-        batimentCombo.setValue(null);
-        datePicker.setValue(null);
-        typeField.clear();
-        statutCombo.setValue(null);
-        descriptionArea.clear();
-    }
-
-    private void showError(String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Erreur");
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait();
     }
 }
