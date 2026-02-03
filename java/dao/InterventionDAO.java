@@ -7,6 +7,8 @@ import util.HibernateUtil;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+
 
 import java.util.List;
 
@@ -133,4 +135,42 @@ public class InterventionDAO {
 
         return list;
     }
+    
+    public List<Intervention> findByCriteria(
+            Technicien technicien,
+            Batiment batiment,
+            String statut
+    ) {
+
+        try (Session session = HibernateUtil.openSession()) {
+
+            StringBuilder hql = new StringBuilder("from Intervention i where 1=1");
+
+            if (technicien != null) {
+                hql.append(" and i.technicien = :technicien");
+            }
+            if (batiment != null) {
+                hql.append(" and i.batiment = :batiment");
+            }
+            if (statut != null && !statut.isBlank()) {
+                hql.append(" and i.statut = :statut");
+            }
+
+            Query<Intervention> query =
+                    session.createQuery(hql.toString(), Intervention.class);
+
+            if (technicien != null) {
+                query.setParameter("technicien", technicien);
+            }
+            if (batiment != null) {
+                query.setParameter("batiment", batiment);
+            }
+            if (statut != null && !statut.isBlank()) {
+                query.setParameter("statut", statut);
+            }
+
+            return query.getResultList();
+        }
+    }
+
 }
